@@ -578,7 +578,7 @@ unsigned float_i2f(int x) {
     while (!(mag & (1u << e)))
         e--;
 
-    exp = (unsigned)(e + 127);
+    exp = e + 127;
 
     if (e <= 23) {
         frac = (mag << (23 - e)) & 0x007fffffu;
@@ -642,19 +642,29 @@ int bitCount(int x) {
  */
 int bitReverse(int x)
 {
-   x = ((x >> 1) & 0x55555555) |
-        ((x & 0x55555555) << 1);
+   int m1 = 0x55;
+  int m2 = 0x33;
+  int m4 = 0x0f;
+  int m8 = 0xff;
+  int m16 = 0xff;
 
-    x = ((x >> 2) & 0x33333333) |
-        ((x & 0x33333333) << 2);
+  m1 = m1 | (m1 << 8);
+  m1 = m1 | (m1 << 16);
 
-    x = ((x >> 4) & 0x0f0f0f0f) |
-        ((x & 0x0f0f0f0f) << 4);
+  m2 = m2 | (m2 << 8);
+  m2 = m2 | (m2 << 16);
 
-    x = ((x >> 8) & 0x00ff00ff) |
-        ((x & 0x00ff00ff) << 8);
+  m4 = m4 | (m4 << 8);
+  m4 = m4 | (m4 << 16);
 
-    x = (x << 16) | ((x >> 16) & 0x0000ffff);
+  m8 = m8 | (m8 << 16);
+  m16 = m16 | (m16 << 8);
 
-    return x;
+  x = ((x >> 1) & m1) | ((x & m1) << 1);
+  x = ((x >> 2) & m2) | ((x & m2) << 2);
+  x = ((x >> 4) & m4) | ((x & m4) << 4);
+  x = ((x >> 8) & m8) | ((x & m8) << 8);
+  x = (x << 16) | ((x >> 16) & m16);
+
+  return x;
 }
